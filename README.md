@@ -1,4 +1,5 @@
 # IAQsensors
+!!!Current State on other branch!!!
 
 1. sensorDataCollector receives sensor data on serial port/USB -> connects to sqlite db -> parses data in table format to local sensor_data.db
 
