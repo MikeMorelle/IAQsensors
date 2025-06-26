@@ -11,14 +11,14 @@ How to use:
 
 
 TODO: 
-- serial port check (Michael)
-- improve GUI (dark mode, structure, pollutant selects,...)
+- serial port check (Michael) DONE
+- improve GUI (dark mode, structure, pollutant selects,...) 
 - Microcontoller LED alarms (Michael)
 - db clean after certain amount of time to prevent memory overflow
-- correct kalman filter (Michael)
+- correct kalman filter (Michael) DONE
 - outlier handling and logging
-- system health logs
-- IAQ index
-- show min/max/avg of each pollutant
-- correlation graphs between pollutants
+- system health logs DONE
+- HUMIDEX index DONE
+- show min/max/avg of each pollutant DONE
+- correlation graphs between pollutants DONE
 - compare with FMEA requirements and add error handlings
