@@ -2,36 +2,53 @@ import serial
 import sqlite3
 import time
 from datetime import datetime
+from findActivePort import find_active_port
 
 # === CONFIGURATION ===
-SERIAL_PORT = 'COM5'
+SERIAL_PORT = find_active_port()
+if not SERIAL_PORT:
+    raise Exception("No active serial port found. Please connect the sensor and try again.")
 BAUDRATE = 115200
-DB_NAME = 'sensor_data.db'
+DB_NAME = 'sensor_data.db' 
 
 # === CONNECT TO DATABASE ===
 conn = sqlite3.connect(DB_NAME)
 cursor = conn.cursor()
 
-# === CREATE TABLE ===
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS sensor_readings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     timestamp TEXT,
     co2 REAL,
+    co2_unit TEXT,
     temperature REAL,
+    temperature_unit TEXT,
     humidity REAL,
+    humidity_unit TEXT,
     eco2 REAL,
+    eco2_unit TEXT,
     tvoc REAL,
+    tvoc_unit TEXT,
     pm_2_5 REAL,
+    pm_2_5_unit TEXT,
     pm_10_0 REAL,
+    pm_10_0_unit TEXT,
     pm_0_5 REAL,
+    pm_0_5_unit TEXT,
     pm_1_0 REAL,
+    pm_1_0_unit TEXT,
     pm_4_0 REAL,
+    pm_4_0_unit TEXT,
     pm_1_0_nc REAL,
+    pm_1_0_nc_unit TEXT,
     pm_2_5_nc REAL,
+    pm_2_5_nc_unit TEXT,
     pm_4_0_nc REAL,
+    pm_4_0_nc_unit TEXT,
     pm_10_0_nc REAL,
-    typical_particle_size REAL
+    pm_10_0_nc_unit TEXT,
+    typical_particle_size REAL,
+    typical_particle_size_unit TEXT
 )
 ''')
 conn.commit()
@@ -52,8 +69,7 @@ def parse_sensor_data(lines):
             try:
                 data[pollutant] = float(value)
             except ValueError:
-                print(f"Value error for {pollutant}: {value} is not a float.")
-                continue
+                data[pollutant] = value
         except Exception as e:
             print(f"Error parsing line '{line}': {e}")
             continue
@@ -84,18 +100,21 @@ while True:
 
             # prepare data for database insertion
             fields = [
-                'co2', 'temperature', 'humidity', 'eco2', 'tvoc',
-                'pm_2_5', 'pm_10_0', 'pm_0_5', 'pm_1_0', 'pm_4_0',
-                'pm_1_0_nc', 'pm_2_5_nc', 'pm_4_0_nc', 'pm_10_0_nc',
-                'typical_particle_size'
+                'co2', 'co2_unit', 'temperature', 'temperature_unit', 'humidity', 'humidity_unit',
+                'eco2', 'eco2_unit', 'tvoc', 'tvoc_unit',
+                'pm_2_5', 'pm_2_5_unit', 'pm_10_0', 'pm_10_0_unit',
+                'pm_0_5', 'pm_0_5_unit', 'pm_1_0', 'pm_1_0_unit', 'pm_4_0', 'pm_4_0_unit',
+                'pm_1_0_nc', 'pm_1_0_nc_unit', 'pm_2_5_nc', 'pm_2_5_nc_unit',
+                'pm_4_0_nc', 'pm_4_0_nc_unit', 'pm_10_0_nc', 'pm_10_0_nc_unit',
+                'typical_particle_size', 'typical_particle_size_unit'
             ]
-
-            values = [sensor_data.get(field) for field in fields]
 
             # Ensure all fields are present, filling missing ones with None
             for field in fields:
                 if field not in sensor_data:
                     sensor_data[field] = None
+
+            values = [sensor_data.get(field) for field in fields]
 
             #send data to database
             cursor.execute(f'''
