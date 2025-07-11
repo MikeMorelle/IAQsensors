@@ -1,1 +1,1 @@
-# IAQsensor code SSNS Project
+# IAQSensor system SSNS
